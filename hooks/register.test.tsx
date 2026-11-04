@@ -3,9 +3,9 @@ import { expect, mock, test } from 'claude-code/testing'
 import { countFreezerItems, formatTonightsDinner, localDateString, parseDinnersForDate, tagSvg, currentMenuOrEmpty, formatDayLabel, groupByCuisine, averageStars, parseMenuItems, parseWeekSchedule, parseWeekThumbnails, readMcpText, thumbnailSvg } from './register'
 
 const PANE = {
-  plugin: 'FtF-mod',
+  plugin: 'ftf-mod',
   component: 'Pane',
-  requestId: 'FtF-mod',
+  requestId: 'ftf-mod',
   props: {
     title: 'FeedTheFamily',
     isFocused: false,

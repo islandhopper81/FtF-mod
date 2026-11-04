@@ -3,7 +3,7 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { CuisineGroup, Day, Dish, Menu, MenuDish, Tab, Week } from '../types'
 
-const PANE = 'FtF-mod'
+const PANE = 'ftf-mod'
 const DEFAULT_API_URL = 'https://feedthefamily.app'
 // Locally the API runs on :3001 and the app on Vite's :3000; in production they share a host.
 const LOCAL_API_ORIGIN = 'http://localhost:3001'
@@ -134,10 +134,10 @@ const PLACEHOLDER_SVG = roundedSvg(
 )
 
 const EMPTY_WEEK: Week = { status: 'idle', days: [], freezerCount: null, message: null, fetchedAt: null, checkedAt: null }
-const week = atom({ plugin: 'FtF-mod', key: 'week' } as const, EMPTY_WEEK)
-const tab = atom({ plugin: 'FtF-mod', key: 'tab' } as const, 'week' as Tab)
+const week = atom({ plugin: 'ftf-mod', key: 'week' } as const, EMPTY_WEEK)
+const tab = atom({ plugin: 'ftf-mod', key: 'tab' } as const, 'week' as Tab)
 const EMPTY_MENU: Menu = { status: 'idle', query: '', dishes: [], message: null }
-const menu = atom({ plugin: 'FtF-mod', key: 'menu' } as const, EMPTY_MENU)
+const menu = atom({ plugin: 'ftf-mod', key: 'menu' } as const, EMPTY_MENU)
 
 // The MCP route is stateless, so each tools/call is a request of its own. The SDK answers
 // either plain JSON or a one-message event stream, depending on what it chooses to send.

@@ -1,5 +1,5 @@
 {
-  "name": "FtF-mod",
+  "name": "ftf-mod",
   "version": "0.1.0",
   "description": "A FeedTheFamily pane for Claude Code: this week's dinners, your stars, the freezer count and a searchable menu, from your MCP token",
   "types": "./types/index.d.ts"

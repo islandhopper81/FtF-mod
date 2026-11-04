@@ -52,6 +52,6 @@ export type Menu = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'FtF-mod': { week: Week; tab: Tab; menu: Menu }
+    'ftf-mod': { week: Week; tab: Tab; menu: Menu }
   }
 }

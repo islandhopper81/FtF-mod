@@ -1,4 +1,4 @@
-# FtF-mod
+# ftf-mod
 
 A [FeedTheFamily](https://feedthefamily.app) pane for Claude Code. It sits beside the chat and shows:
 
@@ -12,7 +12,7 @@ Every dish links to its page in the app.
 At the prompt of a Claude Code terminal session:
 
 ```
-/plugin install FtF-mod --marketplace islandhopper81/FtF-mod
+/plugin install ftf-mod --marketplace islandhopper81/FtF-mod
 ```
 
 Answer `y` to add the marketplace, then pick a scope (the user scope is first; press Enter).
@@ -20,7 +20,7 @@ Answer `y` to add the marketplace, then pick a scope (the user scope is first; p
 From a shell:
 
 ```bash
-claude plugin install FtF-mod --marketplace islandhopper81/FtF-mod
+claude plugin install ftf-mod --marketplace islandhopper81/FtF-mod
 ```
 
 In the desktop app, where `/plugin` does not run: click + next to the prompt box, then Plugins, Add marketplace with `islandhopper81/FtF-mod`, then Add plugin.
