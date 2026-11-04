@@ -1,0 +1,5 @@
+{
+  "name": "FtF-mod",
+  "owner": { "name": "islandhopper81" },
+  "plugins": [{ "name": "FtF-mod", "source": "./" }]
+}
