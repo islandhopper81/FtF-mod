@@ -1,6 +1,6 @@
 import { expect, mock, test } from 'claude-code/testing'
 
-import { countFreezerItems, tagSvg, currentMenuOrEmpty, formatDayLabel, groupByCuisine, averageStars, parseMenuItems, parseWeekSchedule, parseWeekThumbnails, readMcpText, thumbnailSvg } from './register'
+import { countFreezerItems, formatTonightsDinner, localDateString, parseDinnersForDate, tagSvg, currentMenuOrEmpty, formatDayLabel, groupByCuisine, averageStars, parseMenuItems, parseWeekSchedule, parseWeekThumbnails, readMcpText, thumbnailSvg } from './register'
 
 const PANE = {
   plugin: 'FtF-mod',
@@ -354,4 +354,44 @@ test('a menu saved by an older pane counts as never loaded', () => {
   expect(currentMenuOrEmpty(oldMenu as never)).toEqual({ status: 'idle', query: '', dishes: [], message: null })
   const menu = { status: 'ok' as const, query: 'taco', dishes: parseMenuItems(MENU_TEXT), message: null }
   expect(currentMenuOrEmpty(menu)).toBe(menu)
+})
+
+test('reads only the dinners from a day of meals', () => {
+  const text = 'Meals for 2026-11-03:\nBreakfast: [1] Oatmeal\nDinner: [7] Tacos\nDinner: [8] Side Salad'
+  expect(parseDinnersForDate(text)).toEqual(['Tacos', 'Side Salad'])
+  expect(parseDinnersForDate('No meals scheduled for 2026-11-03.')).toEqual([])
+  expect(formatTonightsDinner(['Tacos', 'Side Salad'])).toBe("Tonight's dinner: Tacos, Side Salad")
+  expect(formatTonightsDinner([])).toBe('Nothing is planned for dinner tonight.')
+})
+
+test('today is the local date, not the UTC one', () => {
+  // 02:30 UTC on Nov 4 is still the evening of Nov 3 in New York.
+  const lateEvening = Date.UTC(2026, 10, 4, 2, 30)
+  expect(localDateString(lateEvening, 'America/New_York')).toBe('2026-11-03')
+  expect(localDateString(lateEvening, 'UTC')).toBe('2026-11-04')
+})
+
+for (const command of ['wfd', 'whats-for-dinner']) {
+  test(`/${command} answers with tonight's dinner and nothing else`, ENGINE_TEST, async ($, on) => {
+    mock.env(on, { FTF_MCP_TOKEN: 'test-token', FTF_TIMEZONE: 'America/New_York' })
+    const calls: { name: string; args: Record<string, unknown> }[] = []
+    on('http.fetch', (_, e) => {
+      const { name, arguments: args } = JSON.parse(e.init?.body ?? '{}').params
+      calls.push({ name, args })
+      const text = name === 'get_meals_for_date' ? 'Meals for 2026-11-03:\nLunch: [5] Soup\nDinner: [7] Tacos' : FREEZER_TEXT
+      return { value: { status: 200, ok: true, headers: {}, text: asEventStream(text) } }
+    })
+    on('clock.now', () => ({ value: Date.UTC(2026, 10, 4, 2, 30) }))
+
+    const result = await $.command.run({ command, args: '', origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 80 } })
+    expect(result).toMatchObject({ text: "Tonight's dinner: Tacos" })
+    expect(calls).toEqual([{ name: 'get_meals_for_date', args: { date: '2026-11-03' } }])
+  })
+}
+
+test('/wfd says why when it cannot reach FeedTheFamily', ENGINE_TEST, async ($, on) => {
+  mock.env(on, {})
+  on('clock.now', () => ({ value: 0 }))
+  const result = await $.command.run({ command: 'wfd', args: '', origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 80 } })
+  expect(result).toMatchObject({ text: expect.stringMatching(/^Could not get tonight's dinner: Set FTF_MCP_TOKEN/) })
 })

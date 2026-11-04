@@ -17,6 +17,8 @@ const STAR_VALUES = [1, 2, 3, 4, 5]
 // The app's built-in dietary tags.
 const DEFAULT_DIETARY_TAGS = ['Healthy', 'Vegetarian', 'Gluten-Free', 'Dairy-Free', 'Vegan']
 const OTHER_CUISINE = 'Other'
+// /wfd and /whats-for-dinner give the same answer.
+const DINNER_DESCRIPTION = "Show what's for dinner tonight on your FeedTheFamily calendar"
 // FeedTheFamily's tagline, under the title on both tabs.
 const TAGLINE = 'Take the mental load off your plate'
 // The app's Menu cards show two dietary tags, then "+N" for the rest.
@@ -253,6 +255,37 @@ export function averageStars(rating: number): string {
   return '★'.repeat(Math.floor(halves / 2)) + (halves % 2 === 1 ? '½' : '')
 }
 
+// get_meals_for_date returns "Meals for YYYY-MM-DD:" then one "Slot: [id] Dish" line per meal, or
+// "No meals scheduled for ...". Only the dinners' names are kept.
+export function parseDinnersForDate(text: string): string[] {
+  return text
+    .split('\n')
+    .map(line => line.match(/^Dinner:\s*(?:\[\d+\]\s*)?(.*)$/)?.[1]?.trim())
+    .filter((name): name is string => Boolean(name))
+}
+
+export function formatTonightsDinner(dinners: string[]): string {
+  return dinners.length === 0 ? 'Nothing is planned for dinner tonight.' : `Tonight's dinner: ${dinners.join(', ')}`
+}
+
+// Today's date where the person is: FTF_TIMEZONE when set, otherwise this computer's own time
+// zone. The server would otherwise take today in UTC, which is tomorrow by evening in the Americas.
+export function localDateString(ms: number, timezone?: string): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(
+    new Date(ms),
+  )
+}
+
+async function tonightsDinner($: EngineInterface): Promise<string> {
+  try {
+    const timezone = (await $.env.get('FTF_TIMEZONE')) || undefined
+    const date = localDateString(await $.clock.now(), timezone)
+    return formatTonightsDinner(parseDinnersForDate(await callTool($, 'get_meals_for_date', { date })))
+  } catch (error) {
+    return `Could not get tonight's dinner: ${error instanceof Error ? error.message : String(error)}`
+  }
+}
+
 // list_freezer_items returns one "[id] Dish — qty: N, ..." line per item, or "Freezer is empty."
 export function countFreezerItems(text: string): number {
   return text.split('\n').filter(line => /^\[\d+\]/.test(line)).length
@@ -393,6 +426,8 @@ export const register: Register = on => {
       name: 'this-week',
       description: "Show this week's FeedTheFamily dinners and your menu in a pane",
     })
+    await $.command.register({ name: 'wfd', description: DINNER_DESCRIPTION })
+    await $.command.register({ name: 'whats-for-dinner', description: DINNER_DESCRIPTION })
     void $.ui.open({ id: PANE, title: 'FeedTheFamily' })
     void refreshWeek($)
     $.clock.every(REFRESH_EVERY_MS, () => refreshWeek($))
@@ -406,6 +441,9 @@ export const register: Register = on => {
 
     return { text: 'This week pane opened.' }
   })
+
+  on('command.run', { command: 'wfd' }, async $ => ({ text: await tonightsDinner($) }))
+  on('command.run', { command: 'whats-for-dinner' }, async $ => ({ text: await tonightsDinner($) }))
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
     const elements = $.ui.resolve(e)

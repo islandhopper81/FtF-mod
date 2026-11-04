@@ -42,6 +42,8 @@ Set them where Claude Code can read them (your user environment variables, or th
 
 Run `/this-week` to open the pane. Press **w** for This week, **m** for Menu, and **Refresh** to load again.
 
+Run `/wfd` (or `/whats-for-dinner`) for tonight's dinner alone, as one line such as `Tonight's dinner: Tacos, Side Salad`. "Tonight" is today in `FTF_TIMEZONE`, or in your computer's time zone when that is unset.
+
 Photos in the week view and the stars you have already given need a FeedTheFamily server recent enough to have them; with an older one the week shows dish names and the stars start empty.
 
 ## Develop
