@@ -17,6 +17,8 @@ const STAR_VALUES = [1, 2, 3, 4, 5]
 // The app's built-in dietary tags.
 const DEFAULT_DIETARY_TAGS = ['Healthy', 'Vegetarian', 'Gluten-Free', 'Dairy-Free', 'Vegan']
 const OTHER_CUISINE = 'Other'
+// FeedTheFamily's tagline, under the title on both tabs.
+const TAGLINE = 'Take the mental load off your plate'
 // The app's Menu cards show two dietary tags, then "+N" for the rest.
 const SHOWN_TAG_COUNT = 2
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -645,9 +647,7 @@ export const register: Register = on => {
                   Feed The Family
                 </Text>
               )}
-              <Text color="subtle">
-                {currentTab === 'week' ? "This week's dinners" : 'Take the mental load off your plate'}
-              </Text>
+              <Text color="subtle">{TAGLINE}</Text>
             </Box>
           </Box>
           <Button

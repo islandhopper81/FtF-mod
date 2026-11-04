@@ -208,6 +208,7 @@ test('the pane shows the week fetched with the token', ENGINE_TEST, async ($, on
   expect((await desktop.find({ type: 'Link', text: 'Side Salad' }))?.props.href).toBe('http://localhost:3000/menu/13')
   expect(await desktop.find({ type: 'Text', text: /Tacos · Side Salad/ })).toBeUndefined()
   // The header carries the app's logo and wordmark.
+  expect(await desktop.find({ type: 'Text', text: 'Take the mental load off your plate' })).toBeDefined()
   expect((await desktop.findAll({ type: 'Svg' })).map(svg => svg.props.alt)).toContain('Feed The Family')
   // Desktop draws the title as a picture, so it can be larger than the pane's text.
   expect(await desktop.find({ type: 'Text', text: 'Feed The Family' })).toBeUndefined()
